@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+        <div class="main">
+            <div class="article">
+                <h1>Movies recommended for you</h1>
+                <div>
+                    {% for rec in recommendations %}
+                        <p>{{ rec }}</p>
+                    {% endfor%}
+                </div>    
+            </div>
+        </div>  
+{% endblock content %}
