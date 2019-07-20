@@ -6,7 +6,7 @@ from flask_heroku import Heroku
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xRZgiO5v5OgSszuo7dME6A'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/admin'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://lkawrazylcwjbn:06ee2fea72e90f0ee40a7687f2ff61c54e2b4c030a60798565311397d38bccad@ec2-107-20-173-2.compute-1.amazonaws.com:5432/dbgc6u09n5vnrk'
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
