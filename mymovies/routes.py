@@ -67,22 +67,23 @@ def movies():
 def new_movie():
     form = MovieForm()
     if form.validate_on_submit():
-        movie_data = add_movies(form.url.data, form.rating.data)
-        movie = Movie(title=movie_data[0], genre=movie_data[1], imdb_rating=movie_data[2],
-                        self_rating=movie_data[3], duration=movie_data[4], release_date=movie_data[5], user=current_user)
         try: 
+            movie_data = add_movies(form.url.data, form.rating.data)
+            movie = Movie(title=movie_data[0], genre=movie_data[1], imdb_rating=movie_data[2],
+                            self_rating=movie_data[3], duration=movie_data[4], release_date=movie_data[5], user=current_user)
             db.session.add(movie)
             db.session.commit()
             flash(f'Movie added!', 'success')
             return redirect(url_for('movies'))
         except:
-            flash(f'You already added this movie!', 'danger')
+            flash('Cannot add this movie. Please try another one!', 'danger')
+
     return render_template('add_movie.html', title='Add Movie', form=form, legend='Add Movie')
 
 @app.route("/sort/<string:order>")
 def sort(order):
     movies = Movie.query.order_by(getattr(Movie,order).desc()).all()
-    return render_template('home.html', title='Home', movies=movies)
+    return render_template('movies.html', title='Movies', movies=movies)
 
 @app.route("/recommend")
 @login_required
@@ -90,7 +91,10 @@ def recommend():
     if Movie.query.first() is None:
         flash(f'Please add some movies first!', 'danger')
         return redirect(url_for('new_movie'))
-    genre = db.session.execute('SELECT movie.genre, COUNT(movie.genre) AS most_frequent FROM movie WHERE self_rating > 6 GROUP BY movie.genre ORDER BY most_frequent DESC LIMIT 1;').fetchone()
+    genre = db.session.execute('SELECT movie.genre, COUNT(movie.genre) AS most_frequent FROM movie WHERE self_rating >= 6 GROUP BY movie.genre ORDER BY most_frequent DESC LIMIT 1;').fetchone()
+    if genre is None:
+        flash(f'Please add some movies that you like!', 'danger')
+        return redirect(url_for('new_movie'))
     recommendations = show_rec(genre[0])
     
     return render_template('recommendation.html', title='Recommendation', recommendations=recommendations, genre=genre[0])
