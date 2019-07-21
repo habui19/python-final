@@ -25,3 +25,8 @@ class MovieForm(FlaskForm):
     url = StringField('Url', validators=[DataRequired()])
     rating = StringField('Self-rating', validators=[DataRequired()])
     submit = SubmitField('Add')
+
+class SearchForm(FlaskForm):
+    titletype = StringField('Title Type', validators=[DataRequired()])
+    genre = StringField('Genre', validators=[DataRequired()])
+    submit = SubmitField('Search')

@@ -53,11 +53,3 @@ def show_rec(genre):
     recommendations = [title.find('h3').text.strip() for title in titles]
 
     return recommendations
-
-def exit():
-    sys.exit()
-
-if __name__ == "__main__":
-    current_menu = main_menu()
-    while True:
-        current_menu = current_menu()

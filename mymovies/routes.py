@@ -1,9 +1,10 @@
 from flask import render_template, url_for, flash, redirect, request, abort
 from mymovies import app, db, bcrypt
-from mymovies.forms import RegistrationForm, LoginForm, MovieForm
+from mymovies.forms import RegistrationForm, LoginForm, MovieForm, SearchForm
 from mymovies.models import User, Movie
 from flask_login import login_user, current_user, logout_user, login_required
 from mymovies.movies import add_movies, show_rec
+from mymovies.movie_match import search_movie
 
 @app.route("/")
 @app.route("/home")
@@ -46,9 +47,14 @@ def logout():
     logout_user()
     return redirect(url_for('about'))
 
-@app.route("/search")
+@app.route("/search", methods=["GET", "POST"])
 def search():
-    return render_template('search.html', title='Search')
+    form = SearchForm()
+    if form.validate_on_submit():
+        results = search_movie(form.titletype.data, form.genre.data)
+        return render_template('results.html', title='Search Results', results=results)
+    return render_template('search.html', title='Search', form=form)
+
 @app.route("/movies")
 @login_required
 def movies():
