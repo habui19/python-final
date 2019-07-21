@@ -3,8 +3,9 @@ from mymovies import app, db, bcrypt
 from mymovies.forms import RegistrationForm, LoginForm, MovieForm, SearchForm
 from mymovies.models import User, Movie
 from flask_login import login_user, current_user, logout_user, login_required
-from mymovies.movies import add_movies, show_rec
+from mymovies.movies import add_movies, most_frequent, show_rec
 from mymovies.movie_match import search_movie
+from sqlalchemy import func
 
 @app.route("/")
 @app.route("/home")
@@ -70,7 +71,7 @@ def new_movie():
         try: 
             movie_data = add_movies(form.url.data, form.rating.data)
             movie = Movie(title=movie_data[0], genre=movie_data[1], imdb_rating=movie_data[2],
-                            self_rating=movie_data[3], duration=movie_data[4], release_date=movie_data[5], user=current_user)
+                            self_rating=movie_data[3], duration=movie_data[4], user=current_user)
             db.session.add(movie)
             db.session.commit()
             flash(f'Movie added!', 'success')
@@ -91,13 +92,16 @@ def recommend():
     if Movie.query.first() is None:
         flash(f'Please add some movies first!', 'danger')
         return redirect(url_for('new_movie'))
-    genre = db.session.execute('SELECT movie.genre, COUNT(movie.genre) AS most_frequent FROM movie WHERE self_rating >= 6 GROUP BY movie.genre ORDER BY most_frequent DESC LIMIT 1;').fetchone()
-    if genre is None:
+
+    movies = Movie.query.filter(Movie.user_id==current_user.id, Movie.self_rating >=6).all()
+    if movies is None:
         flash(f'Please add some movies that you like!', 'danger')
         return redirect(url_for('new_movie'))
-    recommendations = show_rec(genre[0])
+    genres = [movie.genre for movie in movies]
+    genre = most_frequent(genres)
+    recommendations = show_rec(genre)
     
-    return render_template('recommendation.html', title='Recommendation', recommendations=recommendations, genre=genre[0])
+    return render_template('recommendation.html', title='Recommendation', recommendations=recommendations, genre=genre)
 
 @app.route("/movies/<int:movie_id>/delete")
 @login_required

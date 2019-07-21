@@ -10,8 +10,6 @@
         <a href="{{ url_for('sort', order='self_rating')}}">Your rating</a>
         <span class="ghost">|</span>
         <a href="{{ url_for('sort', order='duration')}}">Duration</a>
-        <span class="ghost">|</span>
-        <a href="{{ url_for('sort', order='release_date')}}">Release Date</a>
         <br class="clear">
         <table class="table">
           <thead class="thead-light">
@@ -20,7 +18,6 @@
             <th scope="col">Imdb Rating</th>
             <th scope="col">Your Rating</th>
             <th scope="col">Duration</th>
-            <th scope="col">Release Date</th>
             <th scope="col">Delete</th>
           </thead>
           <tbody>
@@ -31,7 +28,6 @@
                 <td class="text-center">{{ movie.imdb_rating }}</td>
                 <td class="text-center">{{ movie.self_rating }}</td>
                 <td>{{ movie.duration }}</td>
-                <td>{{ movie.release_date }}</td>
                 <td class="text-center">
                   <a href="{{ url_for('delete', movie_id=movie.id)}}">
                   <span class="material-icons" style="color:red">delete_forever</span>      

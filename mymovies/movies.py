@@ -23,25 +23,22 @@ def add_movies(url, self_rating):
     duration = s.find('time').text.strip()
     #scrapping genre
     genre = s.find('a')
-    #scrapping release date
-    release_date = s.find('a',{'title':'See more release dates'}).text.strip()
 
     data = []
-
-    #change date as objects to date
-    release_date = release_date.replace(' (Japan)','')
-    release_date = datetime.strptime(release_date, '%d %B %Y')
 
     #change time as objects to time
     duration = duration.replace('h','')
     duration = duration.replace('min','')
     duration = datetime.strptime(duration, '%H %M')
 
-    data = [title.text.strip(), genre.text, imdb_rating.text, self_rating, duration, release_date]
+    data = [title.text.strip(), genre.text, imdb_rating.text, self_rating, duration]
     return data
 
+def most_frequent(List): 
+    return max(set(List), key = List.count) 
+
 def show_rec(genre):
-    #recommendations based on the most genre that has self rating above or equal to 6 (look line 133)
+    #recommendations based on the most genre that has self rating above or equal to 6
     url = f'https://www.imdb.com/search/title/?genres={genre}'
     #scrapping best feature movies based on genres
     soup = scrape(url)
