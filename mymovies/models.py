@@ -23,8 +23,8 @@ class Movie(db.Model):
     genre = db.Column(db.String(100), nullable=False)
     imdb_rating = db.Column(db.String(100), nullable=False)
     self_rating = db.Column(db.Integer, nullable=False)
-    duration = db.Column(db.String(100), nullable=False)
-    release_date = db.Column(db.String(100), nullable=False)
+    duration = db.Column(db.Time, nullable=False)
+    release_date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):

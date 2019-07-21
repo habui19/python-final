@@ -2,7 +2,8 @@
 {% block content %}
         <div class="main">
             <div class="article">
-                <h1>Movies recommended for you</h1>
+                <h2>Seems like you like {{ genre }} a lot!</h2>
+                <h2>Here are {{ genre }} movies recommended for you</h2>
                 <div>
                     {% for rec in recommendations %}
                         <p>{{ rec }}</p>

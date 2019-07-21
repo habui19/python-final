@@ -8,16 +8,7 @@ from mymovies.movies import add_movies, show_rec
 @app.route("/")
 @app.route("/home")
 def home():
-    try:
-        movies = Movie.query.filter_by(user=current_user).all()
-    except:
-        flash('Please Log in', 'danger')
-        return redirect(url_for('login'))
-    return render_template('home.html', title='Home', movies=movies)
-
-@app.route("/about")
-def about():
-    return render_template('about.html', title='About')
+    return render_template('home.html', title='Home')
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -55,6 +46,16 @@ def logout():
     logout_user()
     return redirect(url_for('about'))
 
+@app.route("/search")
+def search():
+    return render_template('search.html', title='Search')
+@app.route("/movies")
+@login_required
+def movies():
+    movies = Movie.query.filter_by(user=current_user).all()
+
+    return render_template('movies.html', title='Movies', movies=movies)
+
 @app.route("/movie/new", methods=["GET", "POST"])
 @login_required
 def new_movie():
@@ -67,7 +68,7 @@ def new_movie():
             db.session.add(movie)
             db.session.commit()
             flash(f'Movie added!', 'success')
-            return redirect(url_for('home'))
+            return redirect(url_for('movies'))
         except:
             flash(f'You already added this movie!', 'danger')
     return render_template('add_movie.html', title='Add Movie', form=form, legend='Add Movie')
@@ -78,54 +79,23 @@ def sort(order):
     return render_template('home.html', title='Home', movies=movies)
 
 @app.route("/recommend")
+@login_required
 def recommend():
+    if Movie.query.first() is None:
+        flash(f'Please add some movies first!', 'danger')
+        return redirect(url_for('new_movie'))
     genre = db.session.execute('SELECT movie.genre, COUNT(movie.genre) AS most_frequent FROM movie WHERE self_rating > 6 GROUP BY movie.genre ORDER BY most_frequent DESC LIMIT 1;').fetchone()
     recommendations = show_rec(genre[0])
     
-    return render_template('recommendation.html', title='Recommendation', recommendations=recommendations)
+    return render_template('recommendation.html', title='Recommendation', recommendations=recommendations, genre=genre[0])
 
-
-@app.route("/note/<int:note_id>")
-def note(note_id):
-    note = Note.query.get_or_404(note_id)
-    if note.author != current_user:
-        abort(403)
-    return render_template("note.html", title=note.title, note=note)
-
-@app.route("/note/<int:note_id>/update", methods=["GET", "POST"])
+@app.route("/movies/<int:movie_id>/delete")
 @login_required
-def update_note(note_id):
-    note = Note.query.get_or_404(note_id)
-    if note.author != current_user:
+def delete(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    if movie.user != current_user:
         abort(403)
-    form = NoteForm()
-    if form.validate_on_submit():
-        note.title = form.title.data
-        note.content = form.content.data
-        db.session.commit()
-        flash('Note updated!', 'success')
-        return redirect(url_for('note', note_id=note.id))
-    elif request.method == "GET":
-        form.title.data = note.title
-        form.content.data = note.content
-    return render_template('create_note.html', title='Update Note', form=form, legend='Update Note')
-
-@app.route("/note/<int:note_id>/delete", methods=["POST"])
-@login_required
-def delete_note(note_id):
-    note = Note.query.get_or_404(note_id)
-    if note.author != current_user:
-        abort(403)
-    db.session.delete(note)
+    db.session.delete(movie)
     db.session.commit()
-    flash('Note deleted', 'success')
-    return redirect(url_for('home'))
-
-@app.route("/note/<int:note_id>/questions", methods=["GET", "POST"])
-@login_required
-def questions(note_id):
-    note = Note.query.get_or_404(note_id)
-    if note.author != current_user:
-        abort(403)
-    questions = generate(note.content)
-    return render_template("note.html", title=note.title, note=note, questions=questions)
+    flash('Movie deleted', 'success')
+    return redirect(url_for('movies'))

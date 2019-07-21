@@ -20,27 +20,24 @@ def add_movies(url, self_rating):
     imdb_rating = i.find('span',{'itemprop':'ratingValue'})
     s = soup.find('div',{'class':'subtext'})
     #scrapping movie duration
-    duration = s.find('time')
+    duration = s.find('time').text.strip()
     #scrapping genre
     genre = s.find('a')
     #scrapping release date
-    release_date = s.find('a',{'title':'See more release dates'})
+    release_date = s.find('a',{'title':'See more release dates'}).text.strip()
 
     data = []
 
     #change date as objects to date
-    release_date = release_date.text.strip()
-    print(type(release_date))
-    # datefromtheweb = datefromtheweb.replace(' (Japan)','')
-    # datedate = datetime.strptime(datefromtheweb, '%d %B %Y')
+    release_date = release_date.replace(' (Japan)','')
+    release_date = datetime.strptime(release_date, '%d %B %Y')
 
     #change time as objects to time
-    duration = duration.text.strip()
-    # timefromtheweb = timefromtheweb.replace('h','')
-    # timefromtheweb = timefromtheweb.replace('min','')
-    # timetime = datetime.strptime(timefromtheweb, '%H %M')
+    duration = duration.replace('h','')
+    duration = duration.replace('min','')
+    duration = datetime.strptime(duration, '%H %M')
 
-    data = [title.text, genre.text, imdb_rating.text, self_rating, duration, release_date]
+    data = [title.text.strip(), genre.text, imdb_rating.text, self_rating, duration, release_date]
     return data
 
 def show_rec(genre):
