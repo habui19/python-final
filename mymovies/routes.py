@@ -45,7 +45,7 @@ def login():
 @app.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for('about'))
+    return redirect(url_for('home'))
 
 @app.route("/search", methods=["GET", "POST"])
 def search():
