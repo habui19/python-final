@@ -5,7 +5,6 @@ from mymovies.models import User, Movie
 from flask_login import login_user, current_user, logout_user, login_required
 from mymovies.movies import add_movies, most_frequent, show_rec
 from mymovies.movie_match import search_movie
-from sqlalchemy import func
 
 @app.route("/")
 @app.route("/home")
