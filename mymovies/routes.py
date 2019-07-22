@@ -82,7 +82,7 @@ def new_movie():
 
 @app.route("/sort/<string:order>")
 def sort(order):
-    movies = Movie.query.order_by(getattr(Movie,order).desc()).all()
+    movies = Movie.query.filter_by(user=current_user).order_by(getattr(Movie,order).desc()).all()
     return render_template('movies.html', title='Movies', movies=movies)
 
 @app.route("/recommend")
